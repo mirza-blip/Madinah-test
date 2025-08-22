@@ -1,0 +1,24 @@
+{
+  "name": "madinah-playwright-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui-host 0.0.0.0 --ui-port 9323",
+    "test:report": "playwright show-report --host 0.0.0.0 --port 9323",
+    "check": "biome check --write",
+    "format": "biome format --write",
+    "lint": "biome lint --write"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.3",
+    "@playwright/test": "^1.54.1",
+    "@types/node": "^24.1.0",
+    "dotenv": "^17.2.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

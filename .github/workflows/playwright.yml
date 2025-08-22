@@ -1,0 +1,152 @@
+name: Playwright Tests
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [staging, production]
+    outputs:
+      timestamp: ${{ steps.set-timestamp.outputs.timestamp }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Browsers
+        run: npx playwright install 
+
+      - name: Create environment variables file for ${{ matrix.environment }}
+        run: |
+          if [ "${{ matrix.environment }}" = "staging" ]; then
+            echo "BASE_URL=${{ secrets.STAGING_BASE_URL }}" >> .env.staging
+            echo "TEST_EMAIL=${{ secrets.STAGING_TEST_EMAIL }}" >> .env.staging
+            echo "TEST_PASSWORD=${{ secrets.STAGING_TEST_PASSWORD }}" >> .env.staging
+          else
+            echo "BASE_URL=${{ secrets.PROD_BASE_URL }}" >> .env.production
+            echo "TEST_EMAIL=${{ secrets.PROD_TEST_EMAIL }}" >> .env.production
+            echo "TEST_PASSWORD=${{ secrets.PROD_TEST_PASSWORD }}" >> .env.production
+          fi
+
+      - name: Run Playwright tests for ${{ matrix.environment }}
+        run: NODE_ENV=${{ matrix.environment }} npx playwright test tests/${{ matrix.environment }} --reporter=blob
+        
+      - name: Upload blob report for ${{ matrix.environment }}
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blob-report-${{ matrix.environment }}
+          path: blob-report/
+          retention-days: 1
+
+      - name: Set timestamp
+        id: set-timestamp
+        if: always() && matrix.environment == 'production'
+        run: echo "timestamp=$(date +'%Y-%m-%d_%H-%M-%S')" >> "$GITHUB_OUTPUT"
+
+  merge-reports:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all blob reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports 
+
+      - name: Upload combined Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-combined
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Save report with timestamp
+        if: always()
+        run: |
+          mkdir -p gh-pages/${{ needs.test.outputs.timestamp }}
+          cp -r playwright-report/* gh-pages/${{ needs.test.outputs.timestamp }}/
+
+      - name: Add .nojekyll file
+        if: always()
+        run: touch gh-pages/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages
+          publish_branch: gh-pages
+          keep_files: true
+
+  notify:
+    needs: [test, merge-reports]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Set Report URL
+        run: echo REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ needs.test.outputs.timestamp }}" >> $GITHUB_ENV
+      
+      - name: Determine overall test result
+        run: |
+          if [[ "${{ needs.test.result }}" == "success" && "${{ needs.merge-reports.result }}" == "success" ]]; then
+            echo "OVERALL_RESULT=success" >> $GITHUB_ENV
+          else
+            echo "OVERALL_RESULT=failure" >> $GITHUB_ENV
+          fi
+
+      - name: Notify via Slack
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          payload: |
+            {
+              "text": "${{ env.OVERALL_RESULT == 'success' && '✅ Tests passed (Production & Staging)' || '❌ Tests failed (Production & Staging)' }}",
+              "attachments": [
+                {
+                  "title": "Combined Playwright Test Report",
+                  "title_link": "${{ env.REPORT_URL }}"
+                }
+              ]
+            }
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
