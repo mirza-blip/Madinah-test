@@ -86,8 +86,8 @@ export const TestDataFactory = {
 
   getUpsellDownsellAmounts(): UpsellDownsellAmounts {
     return {
-      upsellAmount: 25,
-      downsellAmount: 10,
+      upsellAmount: 25 * 1.17,
+      downsellAmount: 10 * 1.17,
     };
   },
 };

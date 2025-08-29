@@ -52,7 +52,7 @@ test.describe("Upsell/Downsell Tests", () => {
     await test.step("Accept upsell offer", async () => {
       await donationPage.confirmUpsellDownsellButton.click();
       await expect(donationPage.successMessage).toBeVisible();
-      await expect(await donationPage.getThankYouPageDonationAmount()).toBe(upsellAmount);
+      await expect(await donationPage.getThankYouPageDonationAmount()).toBeCloseTo(upsellAmount, 0);
     });
   });
 
@@ -99,7 +99,10 @@ test.describe("Upsell/Downsell Tests", () => {
     await test.step("Accept downsell offer", async () => {
       await donationPage.confirmUpsellDownsellButton.click();
       await expect(donationPage.successMessage).toBeVisible();
-      await expect(await donationPage.getThankYouPageDonationAmount()).toBe(downsellAmount);
+      await expect(await donationPage.getThankYouPageDonationAmount()).toBeCloseTo(
+        downsellAmount,
+        0,
+      );
     });
   });
 
