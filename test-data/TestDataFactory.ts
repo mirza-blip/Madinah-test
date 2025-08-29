@@ -55,6 +55,14 @@ export const TestDataFactory = {
     };
   },
 
+  getExpiredCreditCard(): CreditCard {
+    return {
+      number: "4000-0000-0000-0069",
+      expiry: "11/30",
+      cvv: "111",
+    };
+  },
+
   getCampaignData(): CampaignData {
     return {
       title: "Automated Test Campaign",

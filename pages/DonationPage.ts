@@ -41,6 +41,7 @@ export class DonationPage extends BasePage {
   readonly failed3DS2ChallengeButton: Locator;
   readonly failed3DS2ErrorMessage: Locator;
   readonly insufficientFundsErrorMessage: Locator;
+  readonly expiredCardErrorMessage: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -95,6 +96,7 @@ export class DonationPage extends BasePage {
       .getByRole("button", { name: "Fail Test Authentication" });
     this.failed3DS2ErrorMessage = this.page.getByText("We were unable to");
     this.insufficientFundsErrorMessage = this.page.getByText("Your transaction was declined");
+    this.expiredCardErrorMessage = this.page.getByText("Your expiration date is invalid");
   }
 
   async goto() {

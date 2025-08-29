@@ -172,4 +172,101 @@ test.describe("One-time Donation Tests", () => {
     expect(finalAmount).toBeGreaterThan(initialAmount);
     expect(finalAmount).toBe(initialAmount + donationAmount);
   });
+
+  test("should prevent making a one-time donation with expired credit card", async ({
+    donationPage,
+  }) => {
+    const personalInfo = TestDataFactory.getValidPersonalInfo();
+    const expiredCard = TestDataFactory.getExpiredCreditCard();
+
+    await test.step("Click on donate now button", async () => {
+      await donationPage.startDonation();
+    });
+
+    await test.step("Select donation amount", async () => {
+      await donationPage.selectDonationLevel(0);
+      await donationPage.keepOneTimeButton.click();
+    });
+
+    if (!isLoggedIn) {
+      await test.step("Fill personal information", async () => {
+        await donationPage.fillPersonalInfo(
+          personalInfo.firstName,
+          personalInfo.lastName,
+          personalInfo.email,
+        );
+      });
+    }
+
+    await donationPage.continueButton.click();
+
+    await test.step("Fill credit card information", async () => {
+      await donationPage.fillCreditCardInfo(
+        expiredCard.number,
+        expiredCard.expiry,
+        expiredCard.cvv,
+      );
+    });
+
+    await test.step("Verify donation failure", async () => {
+      await expect(donationPage.expiredCardErrorMessage).toBeVisible();
+    });
+  });
+
+  test("should fail due to minimum donation limits", async ({ donationPage }) => {
+    const customAmount = 10;
+
+    await test.step("Click on donate now button", async () => {
+      await donationPage.startDonation();
+    });
+
+    await test.step("Select custom donation amount", async () => {
+      await donationPage.enterCustomDonationAmount(customAmount);
+    });
+
+    await test.step("Verify minimum donation limits", async () => {
+      await expect(donationPage.page.getByText("Amount should be greater than")).toBeVisible();
+      await expect(donationPage.donateButton).toBeDisabled();
+    });
+  });
+
+  test("should fail due to maximum donation limits", async ({ donationPage }) => {
+    const personalInfo = TestDataFactory.getValidPersonalInfo();
+    const creditCard = TestDataFactory.getValidCreditCard();
+    const customAmount = 1_000_000;
+
+    await test.step("Click on donate now button", async () => {
+      await donationPage.startDonation();
+    });
+
+    await test.step("Select custom donation amount", async () => {
+      await donationPage.enterCustomDonationAmount(customAmount);
+      await donationPage.donateButton.click();
+      await donationPage.keepOneTimeButton.click();
+    });
+
+    if (!isLoggedIn) {
+      await test.step("Fill personal information", async () => {
+        await donationPage.fillPersonalInfo(
+          personalInfo.firstName,
+          personalInfo.lastName,
+          personalInfo.email,
+        );
+      });
+    }
+
+    await donationPage.continueButton.click();
+
+    await test.step("Fill credit card information", async () => {
+      await donationPage.fillCreditCardInfo(creditCard.number, creditCard.expiry, creditCard.cvv);
+    });
+
+    await test.step("Verify donation failure", async () => {
+      await expect(
+        donationPage.page.getByText(
+          "Invoice: Total in cents must have amount less than 1000000 usd for automatic invoice",
+        ),
+      ).toBeVisible();
+    });
+  });
 });
