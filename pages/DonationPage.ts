@@ -42,6 +42,7 @@ export class DonationPage extends BasePage {
   readonly failed3DS2ErrorMessage: Locator;
   readonly insufficientFundsErrorMessage: Locator;
   readonly expiredCardErrorMessage: Locator;
+  readonly currencyConversionOpenBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -97,6 +98,7 @@ export class DonationPage extends BasePage {
     this.failed3DS2ErrorMessage = this.page.getByText("We were unable to");
     this.insufficientFundsErrorMessage = this.page.getByText("Your transaction was declined");
     this.expiredCardErrorMessage = this.page.getByText("Your expiration date is invalid");
+    this.currencyConversionOpenBtn = this.page.getByRole("button", { name: "Open" });
   }
 
   async goto() {
@@ -114,6 +116,12 @@ export class DonationPage extends BasePage {
     this.donationAmount = this.donationLevels.nth(index);
     const text = await this.donationAmount.locator(".MuiBox-root.css-64aydp").first().innerText();
     await this.donationAmount.click();
+    return extractNumericAmount(text);
+  }
+
+  async getDonationLevelAmount(index: number = 0) {
+    const donationAmount = this.donationLevels.nth(index);
+    const text = await donationAmount.locator(".MuiBox-root.css-64aydp").first().innerText();
     return extractNumericAmount(text);
   }
 
