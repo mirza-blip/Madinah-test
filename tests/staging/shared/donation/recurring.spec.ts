@@ -11,14 +11,11 @@ test.describe("Recurring Donation Tests", () => {
     isLoggedIn = typeof storageState === "string" && storageState.includes("login.json");
   });
 
-  test.beforeEach(async ({ donationPage }) => {
-    await donationPage.goto();
-  });
-
-  test.afterEach(async ({ myDonationPage }) => {
+  test.beforeEach(async ({ donationPage, myDonationPage }) => {
     if (isLoggedIn) {
       await myDonationPage.cancelAllRecurringDonations();
     }
+    await donationPage.goto();
   });
 
   test("should allow making a recurring donation with credit card", async ({ donationPage }) => {

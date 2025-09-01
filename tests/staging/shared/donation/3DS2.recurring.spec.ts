@@ -11,14 +11,11 @@ test.describe("3DS2 Tests (Recurring)", () => {
     isLoggedIn = typeof storageState === "string" && storageState.includes("login.json");
   });
 
-  test.beforeEach(async ({ donationPage }) => {
-    await donationPage.goto();
-  });
-
-  test.afterEach(async ({ myDonationPage }) => {
+  test.beforeEach(async ({ donationPage, myDonationPage }) => {
     if (isLoggedIn) {
       await myDonationPage.cancelAllRecurringDonations();
     }
+    await donationPage.goto();
   });
 
   test("should successfully complete a 3DS2 challenge for a recurring donation", async ({
