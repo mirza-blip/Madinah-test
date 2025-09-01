@@ -52,6 +52,15 @@ test.describe("Upsell/Downsell Tests", () => {
     await test.step("Accept upsell offer", async () => {
       await donationPage.confirmUpsellDownsellButton.click();
       await expect(donationPage.successMessage).toBeVisible();
+    });
+
+    await test.step("Close default upsell popup", async () => {
+      if(await donationPage.closeUpsellDownsellPopupButton.isVisible()){
+        await donationPage.closeUpsellDownsellPopupButton.click();
+      } 
+    });
+
+    await test.step("Verify donation amount on thank you page", async () => {
       await expect(await donationPage.getThankYouPageDonationAmount()).toBeCloseTo(upsellAmount, 0);
     });
   });
