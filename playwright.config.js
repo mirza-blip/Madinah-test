@@ -61,7 +61,7 @@ export default defineConfig({
     {
       name: "logged-in-parallel",
       testMatch: [/.*\/shared\/.*\.spec\.ts/, /.*\/logged-in\/.*\.spec\.ts/],
-      testIgnore: /.*\.recurring\.spec\.ts/,
+      testIgnore: /.*\.?recurring\.spec\.ts$/,
       use: {
         storageState: ".auth/login.json",
       },
@@ -69,7 +69,7 @@ export default defineConfig({
     },
     {
       name: "logged-in-sequential-recurring",
-      testMatch: /.*\.recurring\.spec\.ts/,
+      testMatch: /.*\.?recurring\.spec\.ts$/,
       workers: 1,
       use: {
         storageState: ".auth/login.json",
