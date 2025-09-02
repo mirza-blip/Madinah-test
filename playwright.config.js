@@ -80,6 +80,7 @@ export default defineConfig({
     {
       name: "logged-out",
       testMatch: [/.*\/shared\/.*\.spec\.ts/, /.*\/logged-out\/.*\.spec\.ts/],
+      testIgnore: /.*\.?recurring\.spec\.ts$/,
       use: {
         storageState: undefined,
       },
