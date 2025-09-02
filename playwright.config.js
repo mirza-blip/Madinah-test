@@ -71,19 +71,19 @@ export default defineConfig({
       name: "logged-in-sequential-recurring",
       testMatch: /.*\.?recurring\.spec\.ts$/,
       workers: 1,
-      fullyParallel: false, 
+      fullyParallel: false,
       use: {
         storageState: ".auth/login.json",
       },
       dependencies: ["setup"],
     },
-    // {
-    //   name: "logged-out",
-    //   testMatch: [/.*\/shared\/.*\.spec\.ts/, /.*\/logged-out\/.*\.spec\.ts/],
-    //   use: {
-    //     storageState: undefined,
-    //   },
-    // },
+    {
+      name: "logged-out",
+      testMatch: [/.*\/shared\/.*\.spec\.ts/, /.*\/logged-out\/.*\.spec\.ts/],
+      use: {
+        storageState: undefined,
+      },
+    },
   ],
 
   /* Run your local dev server before starting the tests */
