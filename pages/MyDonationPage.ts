@@ -27,12 +27,11 @@ export class MyDonationPage extends BasePage {
 
     let count: number;
     await expect(async () => {
-      const hasNoDonations = await noDonationsText.isVisible();
-      if (hasNoDonations) {
+      if (await noDonationsText.isVisible()) {
         return;
       }
-      count = await this.goToDonationDetailsButton.count();
       await expect(this.goToDonationDetailsButton.first()).toBeVisible();
+      count = await this.goToDonationDetailsButton.count();
     }).toPass();
 
     while (count > 0) {
