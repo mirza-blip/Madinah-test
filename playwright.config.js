@@ -29,7 +29,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 4 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
 
@@ -61,15 +61,15 @@ export default defineConfig({
     {
       name: "logged-in-parallel",
       testMatch: [/.*\/shared\/.*\.spec\.ts/, /.*\/logged-in\/.*\.spec\.ts/],
-      testIgnore: /.*\.?recurring\.spec\.ts$/,
+      testIgnore: [/.*\/donation\/.*\.spec\.ts$/],
       use: {
         storageState: ".auth/login.json",
       },
       dependencies: ["setup"],
     },
     {
-      name: "logged-in-sequential-recurring",
-      testMatch: /.*\.?recurring\.spec\.ts$/,
+      name: "logged-in-sequential-donations",
+      testMatch: [/.*\/shared\/donation\/.*\.spec\.ts/, /.*\/logged-in\/donation\/.*\.spec\.ts/],
       workers: 1,
       fullyParallel: false,
       use: {
@@ -78,9 +78,18 @@ export default defineConfig({
       dependencies: ["setup"],
     },
     {
-      name: "logged-out",
+      name: "logged-out-parallel",
       testMatch: [/.*\/shared\/.*\.spec\.ts/, /.*\/logged-out\/.*\.spec\.ts/],
-      testIgnore: /.*\.?recurring\.spec\.ts$/,
+      testIgnore: [/.*\/donation\/.*\.spec\.ts$/],
+      use: {
+        storageState: undefined,
+      },
+    },
+    {
+      name: "logged-out-sequential-donations",
+      testMatch: [/.*\/shared\/donation\/.*\.spec\.ts/, /.*\/logged-out\/donation\/.*\.spec\.ts/],
+      workers: 1,
+      fullyParallel: false,
       use: {
         storageState: undefined,
       },
