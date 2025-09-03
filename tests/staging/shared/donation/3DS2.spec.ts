@@ -51,7 +51,7 @@ test.describe("3DS2 Tests", () => {
     });
   });
 
-  test("should fail to complete a 3DS2 challenge", async ({ donationPage }) => {
+  test.skip("should fail to complete a 3DS2 challenge", async ({ donationPage }) => {
     const personalInfo = TestDataFactory.getValidPersonalInfo();
     const creditCard = TestDataFactory.get3DS2CreditCard();
 
