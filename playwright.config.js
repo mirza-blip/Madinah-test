@@ -88,6 +88,7 @@ export default defineConfig({
     {
       name: "logged-out-sequential-donations",
       testMatch: [/.*\/shared\/donation\/.*\.spec\.ts/, /.*\/logged-out\/donation\/.*\.spec\.ts/],
+      testIgnore: /.*\.?recurring\.spec\.ts$/,
       workers: 1,
       fullyParallel: false,
       use: {
