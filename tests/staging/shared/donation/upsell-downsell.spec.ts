@@ -55,12 +55,13 @@ test.describe("Upsell/Downsell Tests", () => {
     });
 
     await test.step("Close default upsell popup", async () => {
-      if(await donationPage.closeUpsellDownsellPopupButton.isVisible()){
+      if (await donationPage.closeUpsellDownsellPopupButton.isVisible()) {
         await donationPage.closeUpsellDownsellPopupButton.click();
-      } 
+      }
     });
 
     await test.step("Verify donation amount on thank you page", async () => {
+      await donationPage.page.waitForTimeout(3000);
       await expect(await donationPage.getThankYouPageDonationAmount()).toBeCloseTo(upsellAmount, 0);
     });
   });
