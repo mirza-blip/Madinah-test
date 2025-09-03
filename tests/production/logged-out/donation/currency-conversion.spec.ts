@@ -29,10 +29,10 @@ test("should convert currencies correctly", async ({ donationPage }) => {
 
       await expect(difference).toBeLessThan(5.0);
 
-      if (currency !== "CAD") {
-        await donationPage.currencyConversionOpenBtn.click();
-        await donationPage.page.getByRole("option", { name: "USD" }).click();
-      }
+      // if (currency !== "CAD") {
+      //   await donationPage.currencyConversionOpenBtn.click();
+      //   await donationPage.page.getByRole("option", { name: "USD" }).click();
+      // }
     });
   }
 });
