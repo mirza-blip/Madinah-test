@@ -28,11 +28,6 @@ test("should convert currencies correctly", async ({ donationPage }) => {
       const difference = Math.abs(convertedDonationAmount - expectedAmount);
 
       await expect(difference).toBeLessThan(5.0);
-
-      // if (currency !== "CAD") {
-      //   await donationPage.currencyConversionOpenBtn.click();
-      //   await donationPage.page.getByRole("option", { name: "USD" }).click();
-      // }
     });
   }
 });
