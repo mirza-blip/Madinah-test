@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { BasePage } from "./BasePage";
 
 export class DashboardPage extends BasePage {
@@ -38,18 +38,21 @@ export class DashboardPage extends BasePage {
     await this.deleteCampaignButton.click();
 
     await this.confirmDeleteButton.click();
-
-    await this.page.waitForFunction((expectedCount) => {
-      const campaigns = document.querySelectorAll("[data-testid='campaign-card']");
-      return campaigns.length < expectedCount;
-    }, campaignCount);
   }
 
   async deleteAllCampaigns(): Promise<void> {
-    let campaignCount = await this.campaignCards.count();
+    let campaignCount: number;
+
+    await expect(async () => {
+      await expect(this.campaignCards.first()).toBeVisible();
+      campaignCount = await this.campaignCards.count();
+    }).toPass();
 
     while (campaignCount > 0) {
       await this.deleteCampaignAtIndex(0);
+
+      await this.page.waitForTimeout(1000);
+
       campaignCount = await this.campaignCards.count();
     }
   }
