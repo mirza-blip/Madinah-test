@@ -1,6 +1,6 @@
 services:
   playwright:
-    image: mcr.microsoft.com/playwright:latest
+    image: mcr.microsoft.com/playwright:v1.54.2-jammy
     working_dir: /workdir
     environment:
       - DISPLAY=${DISPLAY}
@@ -9,9 +9,8 @@ services:
       - ./:/workdir
       - /tmp/.X11-unix:/tmp/.X11-unix
     ports:
-      - "9323:9323"
+      - "9322:9322"
     stdin_open: true
     tty: true
     # command: bash
     # sh -c "npx playwright test --headed"
-
