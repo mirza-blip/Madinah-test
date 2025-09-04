@@ -95,6 +95,16 @@ export default defineConfig({
         storageState: undefined,
       },
     },
+    {
+      name: "teardown",
+      testMatch: /.*teardown\.ts$/,
+      dependencies: [
+        "logged-in-parallel",
+        "logged-in-sequential-donations",
+        "logged-out-parallel",
+        "logged-out-sequential-donations",
+      ],
+    },
   ],
 
   /* Run your local dev server before starting the tests */
