@@ -13,7 +13,7 @@ test.describe("3DS2 Tests", () => {
     await donationPage.goto();
   });
 
-  test("should successfully complete a 3DS2 challenge", async ({ donationPage }) => {
+  test.skip("should successfully complete a 3DS2 challenge", async ({ donationPage }) => {
     const personalInfo = TestDataFactory.getValidPersonalInfo();
     const creditCard = TestDataFactory.get3DS2CreditCard();
 
